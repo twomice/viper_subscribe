@@ -56,17 +56,18 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
     $n = Node::load($node->id());
     //add taxonomy flag links to nodes where they are relevant
     $tags = [];
-    if ($n->hasField('taxonomy_vocabulary_5') && $n->field_taxonomy_vocabulary_5) {
-      $terms = $n->field_taxonomy_vocabulary_5->referencedEntities();
+    $terms = [];
+    if ($n->hasField('taxonomy_vocabulary_5') && $n->taxonomy_vocabulary_5) {
+      $terms = array_merge($terms, $n->taxonomy_vocabulary_5->referencedEntities());
     }
-    elseif ($n->hasField('taxonomy_vocabulary_3') && $n->field_taxonomy_vocabulary_3) {
-      $terms = $n->field_taxonomy_vocabulary_3->referencedEntities();
+    if ($n->hasField('taxonomy_vocabulary_3') && $n->taxonomy_vocabulary_3) {
+      $terms = array_merge($terms, $n->taxonomy_vocabulary_3->referencedEntities());
     }
-    elseif ($n->hasField('field_fellows_cohort') && $n->field_field_fellows_cohort) {
-      $terms = $n->field_field_fellows_cohort->referencedEntities();
+    if ($n->hasField('field_fellows_cohort') && $n->field_fellows_cohort) {
+      $terms = array_merge($terms, $n->field_fellows_cohort->referencedEntities());
     }
-    elseif ($n->hasField('taxonomy_forums') && $n->taxonomy_forums) {
-      $terms = $n->taxonomy_forums->referencedEntities();
+    if ($n->hasField('taxonomy_forums') && $n->taxonomy_forums) {
+      $terms = array_merge($terms, $n->taxonomy_forums->referencedEntities());
     }
     if ($terms) {
       //get the taxonomies from the node we're building
@@ -211,17 +212,18 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
         $uids = array_diff_key($uids, $authsubs);
 
         //get taxonomy subs
-        if ($node->hasField('taxonomy_vocabulary_5')) {
-          $terms = $node->field_taxonomy_vocabulary_5->referencedEntities();
+        $terms = [];
+        if ($node->hasField('taxonomy_vocabulary_5') && $node->taxonomy_vocabulary_5) {
+          $terms = array_merge($terms, $node->taxonomy_vocabulary_5->referencedEntities());
         }
-        elseif ($node->hasField('taxonomy_vocabulary_3')) {
-          $terms = $node->field_taxonomy_vocabulary_3->referencedEntities();
+        if ($node->hasField('taxonomy_vocabulary_3') && $node->taxonomy_vocabulary_3) {
+          $terms = array_merge($terms, $node->taxonomy_vocabulary_3->referencedEntities());
         }
-        elseif ($node->hasField('field_fellows_cohort')) {
-          $terms = $node->field_field_fellows_cohort->referencedEntities();
+        if ($node->hasField('field_fellows_cohort') && $node->field_fellows_cohort) {
+          $terms = array_merge($terms, $node->field_fellows_cohort->referencedEntities());
         }
-        elseif ($node->hasField('taxonomy_forums')) {
-          $terms = $node->taxonomy_forums->referencedEntities();
+        if ($node->hasField('taxonomy_forums') && $node->taxonomy_forums) {
+          $terms = array_merge($terms, $node->taxonomy_forums->referencedEntities());
         }
 
         if ($terms) {
