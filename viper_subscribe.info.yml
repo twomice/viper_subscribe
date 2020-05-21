@@ -1,0 +1,16 @@
+name: Viper Subscribe
+type: module
+description: "Viper custom Message Stack implementation."
+core: 8.x
+package: Message
+dependencies:
+  - message:message
+  - message_ui:message_ui
+  - message_ui:message_notify_ui
+  - message_notify:message_notify
+  - message_subscribe:message_subscribe
+  - message_subscribe:message_subscribe_ui
+  - token:token
+  - drupal:node
+  - drupal:comment
+configure: vipersettings.form

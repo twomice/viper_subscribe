@@ -1,0 +1,7 @@
+vipersettings.form:
+  path: '/admin/config/vipersubscribe/settings'
+  defaults:
+    _form: '\Drupal\viper_subscribe\Form\ViperSubscribeSettings'
+    _title: 'Viper Subscribe settings'
+  requirements:
+    _permission: 'administer site configuration'

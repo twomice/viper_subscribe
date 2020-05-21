@@ -1,0 +1,27 @@
+termnames:
+  version: 1.x
+  js:
+    js/termnames.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+taxonomysubscriptionnames:
+  version: 1.x
+  js:
+    js/taxonomysubscriptionnames.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+contenttypenames:
+  version: 1.x
+  js:
+    js/contenttypenames.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+contenttypes:
+  version: 1.x
+  js:
+    js/contenttypes.js: {}
+  dependencies:
+    - core/jquery

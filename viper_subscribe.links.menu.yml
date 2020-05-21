@@ -1,0 +1,5 @@
+vipersettings.form:
+  title: 'Viper Subscribe settings'
+  description: 'Configure settings for the Viper Subscribe module.'
+  route_name: vipersettings.form
+  parent: 'message.main_settings'
