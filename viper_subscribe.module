@@ -139,8 +139,17 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
   // content and then require users to select both 'subscribe' and 'email' if
   // they want to be notified by email. But if we want everyone to be notified
   // by email skipping that module and doing it this way is simpler all around.
-  foreach ($uids as $uid => $delivery_candidate) {
-    $delivery_candidate->addNotifier('email');
+  $digest_mode = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_mode');
+  $digest_interval = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_interval');
+  if ($digest_mode && $digest_interval) {
+    foreach ($uids as $uid => $delivery_candidate) {
+      $delivery_candidate->addNotifier($digest_interval);
+    }
+  }
+  else {
+    foreach ($uids as $uid => $delivery_candidate) {
+      $delivery_candidate->addNotifier('email');
+    }
   }
 /*
   // Add administrators to every subscription list. Doing it this way

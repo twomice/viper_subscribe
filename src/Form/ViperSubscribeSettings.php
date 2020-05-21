@@ -30,6 +30,20 @@ class ViperSubscribeSettings extends ConfigFormBase {
       '#description' => $this->t('Autosubscribe all users to new content?'),
     );
 
+    $form['digest_mode'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Digest Mode'),
+      '#default_value' => $config->get('viper_subscribe.digest_mode'),
+      '#description' => $this->t('Turn on Digest Mode?'),
+    );
+
+    $form['digest_type'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Digest Type'),
+      '#default_value' => $config->get('viper_subscribe.digest_type'),
+      '#description' => $this->t('Machine Name of Digest Type to use'),
+    );
+
     return $form;
   }
 
@@ -46,6 +60,8 @@ class ViperSubscribeSettings extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('viper_subscribe.settings');
     $config->set('viper_subscribe.autosubscribe', $form_state->getValue('autosubscribe'));
+    $config->set('viper_subscribe.digest_mode', $form_state->getValue('digest_mode'));
+    $config->set('viper_subscribe.digest_type', $form_state->getValue('digest_type'));
     $config->save();
     return parent::submitForm($form, $form_state);
   }
