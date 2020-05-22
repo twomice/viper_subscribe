@@ -20,16 +20,6 @@ use Drupal\message_subscribe\Subscribers\DeliveryCandidate;
  * Implements hook_views_pre_render()
  */
 function viper_subscribe_views_pre_render(\Drupal\views\ViewExecutable $view) {
-  //add our taxonomy term name hack to the profile page subscription view for term names
-  if ($view->id() == "subscribe_taxonomy_term") {
-    foreach ($view->result as $row) {
-      $taxon = $row->_entity;
-      $computed_settings[$taxon->id()] = $taxon->getName();
-    }
-    $view->element['#attached']['library'][] = 'viper_subscribe/termnames';
-    $view->element['#attached']['drupalSettings']['viper_subscribe']['termnames'] = $computed_settings;
-  }
-  //add a similar solution to the profile page subscription view for content types because it's busted
   if ($view->id() == "subscribe_node") {
     $request = \Drupal::request()->getRequestUri();
     $arr = explode('/', $request);
@@ -37,6 +27,10 @@ function viper_subscribe_views_pre_render(\Drupal\views\ViewExecutable $view) {
     if ($uri == 'message-subscribe') {
       $view->element['#attached']['library'][] = 'viper_subscribe/contenttypes';
     }
+  }
+  //this view breaks our hack to get around tokens not working in flag links
+  if ($view->id() == "subscribe_taxonomy_term") {
+    unset($view->result);
   }
 }
 

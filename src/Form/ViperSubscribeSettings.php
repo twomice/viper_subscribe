@@ -37,10 +37,10 @@ class ViperSubscribeSettings extends ConfigFormBase {
       '#description' => $this->t('Turn on Digest Mode?'),
     );
 
-    $form['digest_type'] = array(
+    $form['digest_interval'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Digest Type'),
-      '#default_value' => $config->get('viper_subscribe.digest_type'),
+      '#default_value' => $config->get('viper_subscribe.digest_interval'),
       '#description' => $this->t('Machine Name of Digest Type to use'),
     );
 
@@ -62,6 +62,7 @@ class ViperSubscribeSettings extends ConfigFormBase {
     $config->set('viper_subscribe.autosubscribe', $form_state->getValue('autosubscribe'));
     $config->set('viper_subscribe.digest_mode', $form_state->getValue('digest_mode'));
     $config->set('viper_subscribe.digest_type', $form_state->getValue('digest_type'));
+    $config->set('viper_subscribe.digest_interval', $form_state->getValue('digest_interval'));
     $config->save();
     return parent::submitForm($form, $form_state);
   }

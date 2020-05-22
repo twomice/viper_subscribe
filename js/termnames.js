@@ -1,5 +1,5 @@
 (function ($, Drupal) {
-  Drupal.behaviors.myModuleBehavior = {
+  Drupal.behaviors.termnames = {
     attach: function (context, settings) {
       var terms = drupalSettings.viper_subscribe.termnames;
       $.each(terms, function( index, value ) {

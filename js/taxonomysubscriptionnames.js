@@ -1,11 +1,12 @@
 (function ($, Drupal) {
-  Drupal.behaviors.taxonomySubscriptionNames = {
+  Drupal.behaviors.taxonomysubscriptionnames = {
     attach: function (context, settings) {
-      var terms = drupalSettings.viper_subscribe.taxonomysubscriptionnames;
-      $.each(terms, function( index, value ) {
-        var str = $('.js-flag-subscribe-term-' + index + ' a').text().replace('[viper_subscribe:term_name]', value);
-        $('.js-flag-subscribe-term-' + index + ' a').text(str);
-      });
-    }
+        var subterms = drupalSettings.viper_subscribe.taxonomysubscriptionnames;
+        $('.view-id-subscribe_taxonomy_term').hide();
+        $.each(subterms, function( index, value ) {
+          var str = $('.js-flag-subscribe-term-' + index + ' a').text().replace('[viper_subscribe:term_name]', value);
+          $('.js-flag-subscribe-term-' + index + ' a').text(str);
+        });
+      }
   };
 })(jQuery, Drupal);
