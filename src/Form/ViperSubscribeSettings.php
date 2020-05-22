@@ -4,6 +4,7 @@ namespace Drupal\viper_subscribe\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 class ViperSubscribeSettings extends ConfigFormBase {
 
@@ -41,7 +42,11 @@ class ViperSubscribeSettings extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Digest Type'),
       '#default_value' => $config->get('viper_subscribe.digest_interval'),
-      '#description' => $this->t('Machine Name of Digest Type to use'),
+      '#description' => $this->t('Machine Name of Digest Type to use, from <a href=":url">Message: Digest intervals</a>',
+        [
+          ':url' => Url::fromRoute('entity.message_digest_interval.collection')->toString(),
+        ]
+      ),
     );
 
     return $form;
