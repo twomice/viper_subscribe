@@ -64,6 +64,8 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
       $terms = array_merge($terms, $n->taxonomy_forums->referencedEntities());
     }
     if ($terms) {
+      $temp = json_encode($build);
+      \Drupal::logger('my_module')->log('notice', $temp);
       //get the taxonomies from the node we're building
       $computed_settings = [];
       foreach ($terms as $taxon) {
@@ -78,7 +80,7 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
             ],
           ],
           '#create_placeholder' => TRUE,
-          '#weight' => 10,
+          '#weight' => 15,
         ];
         //add this id to our JS so we can go mangle the link title later this is a hack because tokens aren't working for flag links
         $computed_settings[$taxon->id()] = $taxon->getName();
@@ -87,6 +89,9 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
       $build['#attached']['drupalSettings']['viper_subscribe']['termnames'] = $computed_settings;
     }
 
+    //set the weight of the node flags
+    $build['flag_subscribe_node']['#weight'] = 15;
+    $build['flag_subscribe_content_type']['#weight'] = 15;
     //add author flag link to node
 
     //get the author
@@ -101,7 +106,7 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
         ],
       ],
       '#create_placeholder' => TRUE,
-      '#weight' => 10,
+      '#weight' => 15,
     ];
   }
 
@@ -133,8 +138,8 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
   // content and then require users to select both 'subscribe' and 'email' if
   // they want to be notified by email. But if we want everyone to be notified
   // by email skipping that module and doing it this way is simpler all around.
-  $digest_mode = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_mode');
-  $digest_interval = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_interval');
+  //$digest_mode = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_mode');
+  //$digest_interval = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_interval');
   if ($digest_mode && $digest_interval) {
     foreach ($uids as $uid => $delivery_candidate) {
       $delivery_candidate->addNotifier($digest_interval);
