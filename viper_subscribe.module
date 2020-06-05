@@ -89,6 +89,8 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
       $build['#attached']['drupalSettings']['viper_subscribe']['termnames'] = $computed_settings;
     }
 
+    //attach the content type names for flags
+    $build['#attached']['drupalSettings']['viper_subscribe']['bundle'] = $n->type->entity->label();
     //set the weight of the node flags
     $build['flag_subscribe_node']['#weight'] = 15;
     $build['flag_subscribe_content_type']['#weight'] = 15;
