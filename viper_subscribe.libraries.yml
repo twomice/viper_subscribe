@@ -1,5 +1,5 @@
 termnames:
-  version: 1.x
+  version: 2.x
   js:
     js/termnames.js: {}
   dependencies:
