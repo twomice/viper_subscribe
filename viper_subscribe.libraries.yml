@@ -25,3 +25,9 @@ contenttypes:
     js/contenttypes.js: {}
   dependencies:
     - core/jquery
+termaccordion:
+  version: 3.x
+  js:
+    js/termaccordion.js: {}
+  dependencies:
+    - core/jquery

@@ -38,6 +38,7 @@ function viper_subscribe_views_pre_render(\Drupal\views\ViewExecutable $view) {
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, EntityViewDisplayInterface $display) {
+  $build['#attached']['library'][] = 'viper_subscribe/termaccordion';
   //if it's a teaser, make sure we don't get flag links
   //also skip basic pages
   if ($build['#view_mode'] == 'teaser' || $node->type->entity->label() == 'Page') {
