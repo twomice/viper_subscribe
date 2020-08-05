@@ -190,7 +190,8 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
     //Add them to subscribers
     $ctsubs = [];
     foreach ($result as $row) {
-      $ctsubs[] = \Drupal\user\Entity\User::load($row->uid);
+      //$ctsubs[] = \Drupal\user\Entity\User::load($row->uid);
+      $ctsubs[$row->uid] = $row->uid;
     }
     $uids = array_merge($uids, $ctsubs);
 
@@ -218,6 +219,7 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
         foreach ($result as $row) {
           //$authsubs[$row->uid] = \Drupal\user\Entity\User::load($row->uid);
           $authsubs[$row->uid] = $row->uid;
+          //$authsubs = new DeliveryCandidate(array(), array(), $row->uid);
         }
         //subtract the subscribers we found (taxonomy) so we don't notify them on update
         $uids = array_diff_key($uids, $authsubs);
@@ -257,6 +259,7 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
             foreach ($result as $row) {
               //$taxonsubs[$row->uid] = \Drupal\user\Entity\User::load($row->uid);
               $taxonsubs[$row->uid] = $row->uid;
+              //$taxonsubs[] = new DeliveryCandidate(array(), array(), $row->uid);
             }
             //subtract the subscribers we found (taxonomy) so we don't notify them on update
             $uids = array_diff_key($uids, $taxonsubs);
@@ -266,6 +269,8 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
     }
 
   }
+  //remove duplicates
+  $uids = array_unique($uids);
 
   return $uids;
 }
