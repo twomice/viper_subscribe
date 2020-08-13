@@ -8,6 +8,11 @@
           if ($('.flag-accordion').length < 1) {
             $('.flag-subscribe-content-type').add('.flag-subscribe-node').add('.flag-subscribe-term').add('.flag-subscribe-user').wrapAll('<div class="flag-accordion"></div>');
             $('<div id="flag-toggle"><h3>Click for Subscription Options</h3></div>').insertBefore('.flag-accordion');
+            $('#flag-toggle').hover(function() {
+                $(this).css('cursor','pointer');
+            }, function() {
+                $(this).css('cursor','auto');
+            });
             $('#flag-toggle').click(function() {
             if($('.flag-subscribe-content-type').is(":visible")) {
               $('.flag-subscribe-content-type').hide('slow');
