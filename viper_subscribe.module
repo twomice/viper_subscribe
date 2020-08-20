@@ -132,6 +132,8 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
  */
 function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, array $values) {
 
+  //get the flag context we're using
+  $flagContext = array_values($uids)[0]->getFlags();
   // Update each subscriber to use the only available delivery method, email.
   // This code could be adjusted later if other delivery methods are added.
   // For instance, you could add a field to the user to allow each user to
@@ -143,16 +145,7 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
   // by email skipping that module and doing it this way is simpler all around.
   //$digest_mode = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_mode');
   //$digest_interval = \Drupal::config('viper_subscribe.settings')->get('viper_subscribe.digest_interval');
-  if ($digest_mode && $digest_interval) {
-    foreach ($uids as $uid => $delivery_candidate) {
-      $delivery_candidate->addNotifier($digest_interval);
-    }
-  }
-  else {
-    foreach ($uids as $uid => $delivery_candidate) {
-      $delivery_candidate->addNotifier('email');
-    }
-  }
+
 /*
   // Add administrators to every subscription list. Doing it this way
   // means they won't be able to unsubscribe, so use this judiciously.
@@ -190,7 +183,8 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
     //Add them to subscribers
     $ctsubs = [];
     foreach ($result as $row) {
-      $ctsubs[] = \Drupal\user\Entity\User::load($row->uid);
+      //$ctsubs[] = \Drupal\user\Entity\User::load($row->uid);
+      $ctsubs[$row->uid] = new DeliveryCandidate($flagContext, array(), $row->uid);
     }
     $uids = array_merge($uids, $ctsubs);
 
@@ -217,9 +211,10 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
         $authsubs = [];
         foreach ($result as $row) {
           //$authsubs[$row->uid] = \Drupal\user\Entity\User::load($row->uid);
-          $authsubs[$row->uid] = $row->uid;
+          //$authsubs[$row->uid] = $row->uid;
+          $authsubs[$row->uid] = new DeliveryCandidate($flagContext, array(), $row->uid);
         }
-        //subtract the subscribers we found (taxonomy) so we don't notify them on update
+        //subtract the subscribers we found (author) so we don't notify them on update
         $uids = array_diff_key($uids, $authsubs);
 
         //get taxonomy subs
@@ -256,7 +251,8 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
             $taxonsubs = [];
             foreach ($result as $row) {
               //$taxonsubs[$row->uid] = \Drupal\user\Entity\User::load($row->uid);
-              $taxonsubs[$row->uid] = $row->uid;
+              //$taxonsubs[$row->uid] = $row->uid;
+              $taxonsubs[$row->uid] = new DeliveryCandidate($flagContext, array(), $row->uid);
             }
             //subtract the subscribers we found (taxonomy) so we don't notify them on update
             $uids = array_diff_key($uids, $taxonsubs);
@@ -265,6 +261,19 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
       }
     }
 
+  }
+  //remove duplicates
+  //$uids = array_unique($uids);
+
+  if ($digest_mode && $digest_interval) {
+    foreach ($uids as $uid => $delivery_candidate) {
+      $delivery_candidate->addNotifier($digest_interval);
+    }
+  }
+  else {
+    foreach ($uids as $uid => $delivery_candidate) {
+      $delivery_candidate->addNotifier('email');
+    }
   }
 
   return $uids;
