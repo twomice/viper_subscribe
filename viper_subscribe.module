@@ -438,29 +438,20 @@ function viper_subscribe_update_message_status(ContentEntityBase $entity) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function viper_subscribe_form_node_form_alter(&$form, FormStateInterface $form_state) {
-  $id = $form_state->getFormObject()->getEntity()->id();
-  if ($id) {
-    $database = \Drupal::database();
-    $query = $database->query("SELECT COUNT(*) FROM `viper_subscribe_node` WHERE nid = {$id};");
-    $result = $query->fetchAll();
-    $count = $result[0]->{'COUNT(*)'};
-    if ($count > 0) {
-      $default = 1;
-    }
-    else {
-      $default = 0;
-    }
-  }
+function viper_subscribe_form_node_form_alter(&$form, Drupal\Core\Form\FormState $form_state) {
   $form['viper_subscribe_send_notifications'] = [
     '#type' => 'checkbox',
     '#title' => 'Send Subscription Notifications',
-    '#default_value' => $default,
+    // Always check this box by default:
+    '#default_value' => 1,
   ];
 
   foreach (array_keys($form['actions']) as $action) {
     if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
-      $form['actions'][$action]['#submit'][] = 'viper_subscribe_form_node_submit';
+      // Unshift our handler to the front of the 'submit' stack, so it runs before
+      // native node submit, and therefore before hook_node_update(), which actually
+      // does the sending.
+      array_unshift($form['actions'][$action]['#submit'], 'viper_subscribe_form_node_submit');
     }
   }
 }
@@ -468,19 +459,20 @@ function viper_subscribe_form_node_form_alter(&$form, FormStateInterface $form_s
 /**
  * Implements hook_node_form_submit().
  */
-function viper_subscribe_form_node_submit(array $form, FormStateInterface $form_state) {
+function viper_subscribe_form_node_submit(array $form, Drupal\Core\Form\FormState $form_state) {
   $database = \Drupal::database();
+  $nid = $form_state->getFormObject()->getEntity()->id();
   if ($form_state->getValue('viper_subscribe_send_notifications') == 1) {
     $database->merge('viper_subscribe_node')
-      ->key('nid', $form_state->getValue('nid'))
+      ->key('nid', $nid)
       ->fields([
-        'nid' => $form_state->getValue('nid'),
+        'nid' => $nid
       ])
       ->execute();
   }
   else {
     $database->delete('viper_subscribe_node')
-      ->condition('nid', $form_state->getValue('nid'))
+      ->condition('nid', $nid)
       ->execute();
   }
 }
