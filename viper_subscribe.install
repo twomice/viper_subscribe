@@ -1,0 +1,45 @@
+<?php
+
+use Drupal\Core\Database\Database;
+
+function viper_subscribe_schema() {
+  $schema['viper_subscribe_node'] = [
+    'description' => 'Stores per-node configuration for viper_subscribe. existence = checked',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'primary key',
+      ],
+      'nid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'node id',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}
+
+function viper_subscribe_update_8001() {
+  $spec = [
+    'description' => 'Stores per-node configuration for viper_subscribe. existence = checked',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'primary key',
+      ],
+      'nid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'node id',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+  $schema = Database::getConnection()->schema();
+  $schema->createTable('viper_subscribe_node', $spec);
+}
