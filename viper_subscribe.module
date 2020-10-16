@@ -131,6 +131,11 @@ function viper_subscribe_node_view_alter(array &$build, EntityInterface $node, E
  *   - 'subscribe_options' - The subscribe options array.
  */
 function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, array $values) {
+  if (empty($uids)) {
+    // If there are no subscribers, we can safely return now. Othwerwise we'll
+    // get a fatal in getFlags() below, since there is no $uids[0].
+    return;
+  }
 
   //get the flag context we're using
   $flagContext = array_values($uids)[0]->getFlags();
@@ -285,10 +290,13 @@ function viper_subscribe_message_subscribe_get_subscribers_alter(array &$uids, a
 function viper_subscribe_node_insert(Node $node) {
   $id = $node->id();
   $database = \Drupal::database();
-  $query = $database->query("SELECT COUNT(*) FROM `viper_subscribe_node` WHERE nid = {$id};");
+  // Look for any rows that say we should skip notifications for this node. i.e.,
+  // such a row must exist and must say 'skip_notifications'; otherwise, we send
+  // the notificaitons.
+  $query = $database->query("SELECT COUNT(*) FROM `viper_subscribe_node` WHERE nid = {$id} AND skip_notification = 1;");
   $result = $query->fetchAll();
   $count = $result[0]->{'COUNT(*)'};
-  if ($count > 0) {
+  if ($count == 0) {
     $subscribers = \Drupal::service('message_subscribe.subscribers');
 
     // Add a message for the node author.
@@ -342,10 +350,13 @@ function viper_subscribe_node_insert(Node $node) {
 function viper_subscribe_node_update(Node $node) {
   $id = $node->id();
   $database = \Drupal::database();
-  $query = $database->query("SELECT COUNT(*) FROM `viper_subscribe_node` WHERE nid = {$id};");
+  // Look for any rows that say we should skip notifications for this node. i.e.,
+  // such a row must exist and must say 'skip_notifications'; otherwise, we send
+  // the notificaitons.
+  $query = $database->query("SELECT COUNT(*) FROM `viper_subscribe_node` WHERE nid = {$id} AND skip_notification = 1;");
   $result = $query->fetchAll();
   $count = $result[0]->{'COUNT(*)'};
-  if ($count > 0) {
+  if ($count == 0) {
     //$notifier = \Drupal::service('message_notify.sender');
     $subscribers = \Drupal::service('message_subscribe.subscribers');
 
@@ -439,11 +450,17 @@ function viper_subscribe_update_message_status(ContentEntityBase $entity) {
  * Implements hook_form_FORM_ID_alter().
  */
 function viper_subscribe_form_node_form_alter(&$form, Drupal\Core\Form\FormState $form_state) {
-  $form['viper_subscribe_send_notifications'] = [
+  $nid = $form_state->getFormObject()->getEntity()->id();
+  if (!$nid) {
+    // No $nid means we're creating a new node, in which case we'll never skip
+    // notifications, so no need to add this checkbox nor our extra submit handler.
+    return;
+  }
+  $form['viper_subscribe_skip_notifications'] = [
     '#type' => 'checkbox',
-    '#title' => 'Send Subscription Notifications',
-    // Always check this box by default:
-    '#default_value' => 1,
+    '#title' => 'Skip Subscription Notifications',
+    // Always un-check this box by default:
+    '#default_value' => 0,
   ];
 
   foreach (array_keys($form['actions']) as $action) {
@@ -462,17 +479,17 @@ function viper_subscribe_form_node_form_alter(&$form, Drupal\Core\Form\FormState
 function viper_subscribe_form_node_submit(array $form, Drupal\Core\Form\FormState $form_state) {
   $database = \Drupal::database();
   $nid = $form_state->getFormObject()->getEntity()->id();
-  if ($form_state->getValue('viper_subscribe_send_notifications') == 1) {
-    $database->merge('viper_subscribe_node')
-      ->key('nid', $nid)
-      ->fields([
-        'nid' => $nid
-      ])
-      ->execute();
+  if (!$nid) {
+    // No $nid? Must be a new node; we'll never skip notifications in this case,
+    // so just return.
+    return;
   }
-  else {
-    $database->delete('viper_subscribe_node')
-      ->condition('nid', $nid)
-      ->execute();
-  }
+  $viper_subscribe_skip_notifications = $form_state->getValue('viper_subscribe_skip_notifications') ?? 0;
+  $database->merge('viper_subscribe_node')
+    ->key('nid', $nid)
+    ->fields([
+      'nid' => $nid,
+      'skip_notification' => $viper_subscribe_skip_notifications,
+    ])
+    ->execute();
 }

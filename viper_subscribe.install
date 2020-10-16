@@ -16,6 +16,12 @@ function viper_subscribe_schema() {
         'not null' => TRUE,
         'description' => 'node id',
       ],
+      'skip_notification' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Boolean: skip subscription notifications?',
+        'default' => 0,
+      ],
     ],
     'primary key' => ['id'],
   ];
@@ -24,22 +30,14 @@ function viper_subscribe_schema() {
 }
 
 function viper_subscribe_update_8001() {
-  $spec = [
-    'description' => 'Stores per-node configuration for viper_subscribe. existence = checked',
-    'fields' => [
-      'id' => [
-        'type' => 'serial',
-        'not null' => TRUE,
-        'description' => 'primary key',
-      ],
-      'nid' => [
-        'type' => 'int',
-        'not null' => TRUE,
-        'description' => 'node id',
-      ],
-    ],
-    'primary key' => ['id'],
-  ];
+  $spec = viper_subscribe_schema();
   $schema = Database::getConnection()->schema();
-  $schema->createTable('viper_subscribe_node', $spec);
+  $schema->createTable('viper_subscribe_node', $spec['viper_subscribe_node']);
+}
+
+function viper_subscribe_update_8002() {
+  $spec = viper_subscribe_schema();
+  $schema = Database::getConnection()->schema();
+  $schema->dropTable('viper_subscribe_node');
+  $schema->createTable('viper_subscribe_node', $spec['viper_subscribe_node']);
 }
